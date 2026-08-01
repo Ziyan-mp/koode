@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../config/app_routes.dart';
+import '../config/app_theme.dart';
+import 'app_router.dart';
 
 class KoodeApp extends StatelessWidget {
   const KoodeApp({super.key});
@@ -8,30 +11,9 @@ class KoodeApp extends StatelessWidget {
     return MaterialApp(
       title: 'Koode',
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Text(
-                'Koode',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 8),
-              Text(
-                'Your Voice, Your Campus',
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.grey,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      theme: AppTheme.lightTheme,
+      initialRoute: AppRoutes.splash,
+      onGenerateRoute: AppRouter.generateRoute,
     );
   }
 }
