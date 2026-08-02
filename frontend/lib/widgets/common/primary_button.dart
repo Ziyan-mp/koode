@@ -8,11 +8,16 @@ class PrimaryButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final bool isLoading;
 
+  /// Optional solid background color.
+  /// If null, the default Koode gradient is used.
+  final Color? backgroundColor;
+
   const PrimaryButton({
     super.key,
     required this.text,
     required this.onPressed,
     this.isLoading = false,
+    this.backgroundColor,
   });
 
   @override
@@ -22,14 +27,17 @@ class PrimaryButton extends StatelessWidget {
       height: 54,
       decoration: BoxDecoration(
         borderRadius: AppRadius.pillBorderRadius,
-        gradient: const LinearGradient(
-          colors: [
-            AppColors.accent,
-            AppColors.secondary,
-          ],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
+        gradient: backgroundColor == null
+            ? const LinearGradient(
+                colors: [
+                  AppColors.accent,
+                  AppColors.secondary,
+                ],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              )
+            : null,
+        color: backgroundColor,
         boxShadow: AppShadows.primaryGlow,
       ),
       child: Material(
