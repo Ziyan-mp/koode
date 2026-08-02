@@ -1,13 +1,98 @@
 import 'package:flutter/material.dart';
+import '../../config/app_colors.dart';
+import '../complaints/create_complaint_screen.dart';
+import '../complaints/my_complaints_screen.dart';
+import '../notices/notices_screen.dart';
+import '../profile/profile_screen.dart';
+import 'home_screen.dart';
 
-class StudentMainScreen extends StatelessWidget {
+/// Main container screen for students after authentication.
+/// Manages tab navigation using an IndexedStack to preserve state.
+class StudentMainScreen extends StatefulWidget {
   const StudentMainScreen({super.key});
 
   @override
+  State<StudentMainScreen> createState() => _StudentMainScreenState();
+}
+
+class _StudentMainScreenState extends State<StudentMainScreen> {
+  // Currently active tab index
+  int _selectedIndex = 0;
+
+  // Pages corresponding to each BottomNavigationBar tab
+  final List<Widget> _pages = const [
+    HomeScreen(),
+    MyComplaintsScreen(),
+    CreateComplaintScreen(),
+    NoticesScreen(),
+    ProfileScreen(),
+  ];
+
+  /// Updates selected tab index
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text('Student Main Screen'),
+    return Scaffold(
+      // IndexedStack preserves state across tab switches
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _pages,
+      ),
+
+      // Material 3 Styled Bottom Navigation Bar
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(12),
+              blurRadius: 8,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: AppColors.surface,
+          selectedItemColor: AppColors.primary,
+          unselectedItemColor: AppColors.grey,
+          selectedFontSize: 12,
+          unselectedFontSize: 12,
+          elevation: 0,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_outlined),
+              activeIcon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.assignment_outlined),
+              activeIcon: Icon(Icons.assignment),
+              label: 'Complaints',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.add_circle_outline),
+              activeIcon: Icon(Icons.add_circle),
+              label: 'Create',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.campaign_outlined),
+              activeIcon: Icon(Icons.campaign),
+              label: 'Notices',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline),
+              activeIcon: Icon(Icons.person),
+              label: 'Profile',
+            ),
+          ],
+        ),
       ),
     );
   }

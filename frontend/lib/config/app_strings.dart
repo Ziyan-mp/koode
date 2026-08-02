@@ -1,4 +1,6 @@
 class AppStrings {
-  static const String appTitle = 'Koode';
+  AppStrings._();
+
+  static const String appName = 'KOODE';
   static const String tagline = 'Your Voice, Your Campus';
 }
