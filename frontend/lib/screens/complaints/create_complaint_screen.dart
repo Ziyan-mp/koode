@@ -5,6 +5,7 @@ import '../../config/app_spacing.dart';
 import '../../config/app_text_styles.dart';
 import '../../utils/validators.dart';
 import '../../widgets/common/app_logo.dart';
+import '../../widgets/common/app_background.dart';
 import '../../widgets/common/custom_dropdown.dart';
 import '../../widgets/common/custom_text_field.dart';
 import '../../widgets/common/primary_button.dart';
@@ -269,11 +270,11 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: AppSpacing.lgPadding,
+      body: AppBackground(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: AppSpacing.lgPadding,
             child: Form(
               key: _formKey,
               child: Column(
@@ -711,6 +712,7 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
           ),
         ),
       ),
+    ),
     );
   }
 }

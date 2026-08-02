@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../config/app_assets.dart';
 import '../../config/app_colors.dart';
 import '../../config/app_radius.dart';
 import '../../config/app_shadows.dart';
 import '../../config/app_spacing.dart';
 import '../../config/app_text_styles.dart';
+import '../../widgets/common/app_background.dart';
 import '../complaints/create_complaint_screen.dart';
 
 /// Production-Grade Home Screen for Koode – Your Voice, Your Campus
@@ -106,71 +108,70 @@ class _HomeScreenState extends State<HomeScreen> {
     final isTablet = size.width >= 600;
 
     return Scaffold(
-      body: Stack(
-        children: [
-          // 1. Soft Gradient Background with Decorative Shapes
-          const _HomeBackgroundDecoration(),
+      body: AppBackground(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Section 1: Welcome Header
+                const _WelcomeHeader(studentName: 'Labeeba'),
 
-          // 2. Main Scrollable Content
-          SafeArea(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Section 1: Welcome Header
-                  const _WelcomeHeader(studentName: 'Labeeba'),
+                AppSpacing.lgHeight,
 
-                  AppSpacing.lgHeight,
+                // Section 2 & 3: Auto Sliding Event Banner (Height 200)
+                _EventBannerSlider(
+                  events: _events,
+                  pageController: _pageController,
+                  onPageChanged: (index) {
+                    setState(() {
+                      _currentBannerIndex = index;
+                    });
+                  },
+                ),
 
-                  // Section 2 & 3: Auto Sliding Event Banner (Height 200)
-                  _EventBannerSlider(
-                    events: _events,
-                    pageController: _pageController,
-                    onPageChanged: (index) {
-                      setState(() {
-                        _currentBannerIndex = index;
-                      });
-                    },
-                  ),
+                AppSpacing.smHeight,
 
-                  AppSpacing.smHeight,
+                // Section 4: Animated Page Indicator
+                _PageIndicator(
+                  count: _events.length,
+                  currentIndex: _currentBannerIndex,
+                ),
 
-                  // Section 4: Animated Page Indicator
-                  _PageIndicator(
-                    count: _events.length,
-                    currentIndex: _currentBannerIndex,
-                  ),
+                AppSpacing.lgHeight,
 
-                  AppSpacing.lgHeight,
+                // Section 5: Complaint Categories Grid
+                const Text(
+                  'Complaint Categories',
+                  style: AppTextStyles.heading,
+                ),
 
-                  // Section 5: Complaint Categories Grid
-                  const Text(
-                    'Complaint Categories',
-                    style: AppTextStyles.heading,
-                  ),
+                AppSpacing.mdHeight,
 
-                  AppSpacing.mdHeight,
+                _CategoryGrid(
+                  categories: _categories,
+                  isTablet: isTablet,
+                ),
 
-                  _CategoryGrid(
-                    categories: _categories,
-                    isTablet: isTablet,
-                  ),
-
-                  // Bottom Spacing for FAB & Navigation
-                  const SizedBox(height: 80),
-                ],
-              ),
+                // Bottom Spacing for FAB & Navigation
+                const SizedBox(height: 80),
+              ],
             ),
           ),
-        ],
+        ),
       ),
 
       // Section 6: Floating Action Button
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          debugPrint('Create Complaint');
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const CreateComplaintScreen(),
+            ),
+          );
         },
         backgroundColor: AppColors.primary,
         elevation: 6,
@@ -191,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
           });
         },
         type: BottomNavigationBarType.fixed,
-        backgroundColor: AppColors.surface,
+        backgroundColor: AppColors.surface.withAlpha(240),
         selectedItemColor: AppColors.primary,
         unselectedItemColor: AppColors.grey,
         selectedFontSize: 12,
@@ -228,69 +229,7 @@ class _HomeScreenState extends State<HomeScreen> {
  * Helper Widgets & Data Models
  * ============================================================================ */
 
-/// Background Decoration with Soft Gradient and Abstract Shapes
-class _HomeBackgroundDecoration extends StatelessWidget {
-  const _HomeBackgroundDecoration();
-
-  @override
-  Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-
-    return Stack(
-      children: [
-        // Base Sky Gradient
-        Container(
-          width: double.infinity,
-          height: double.infinity,
-          decoration: const BoxDecoration(
-            gradient: AppColors.backgroundGradient,
-          ),
-        ),
-
-        // Soft Decorative Sunburst/Circle Top Right
-        Positioned(
-          top: -size.width * 0.2,
-          right: -size.width * 0.15,
-          child: Container(
-            width: size.width * 0.65,
-            height: size.width * 0.65,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.primaryLight.withAlpha(100),
-            ),
-          ),
-        ),
-
-        // Soft Decorative Shape Middle Left
-        Positioned(
-          top: size.height * 0.25,
-          left: -size.width * 0.2,
-          child: Container(
-            width: size.width * 0.55,
-            height: size.width * 0.55,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.secondaryLight.withAlpha(90),
-            ),
-          ),
-        ),
-
-        // Cloud Icon Element Top Right Accent
-        Positioned(
-          top: 60,
-          right: 30,
-          child: Icon(
-            Icons.cloud_queue_rounded,
-            size: 40,
-            color: AppColors.primary.withAlpha(40),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// Welcome Header Section (Good Morning 👋, Student Name, Avatar)
+/// Welcome Header Section (Good Morning 👋, Student Name, Avatar with Logo)
 class _WelcomeHeader extends StatelessWidget {
   final String studentName;
 
@@ -298,51 +237,47 @@ class _WelcomeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Good Morning 👋',
-                style: AppTextStyles.body.copyWith(
-                  color: AppColors.textSecondary,
-                  fontWeight: FontWeight.w500,
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: AppColors.white.withAlpha(217),
+        borderRadius: AppRadius.largeBorderRadius,
+        boxShadow: AppShadows.light,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Good Morning 👋',
+                  style: AppTextStyles.body.copyWith(
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-              AppSpacing.xsHeight,
-              Text(
-                studentName,
-                style: AppTextStyles.display.copyWith(
-                  fontSize: 26,
-                  color: AppColors.textPrimary,
+                AppSpacing.xsHeight,
+                Text(
+                  studentName,
+                  style: AppTextStyles.display.copyWith(
+                    fontSize: 26,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.all(3.0),
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: LinearGradient(
-              colors: [AppColors.primary, AppColors.secondary],
+              ],
             ),
           ),
-          child: const CircleAvatar(
-            radius: 28,
-            backgroundColor: AppColors.surface,
-            child: Icon(
-              Icons.person,
-              size: 32,
-              color: AppColors.primary,
-            ),
+          Image.asset(
+            AppAssets.logo,
+            width: 56,
+            height: 56,
+            fit: BoxFit.contain,
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -491,9 +426,7 @@ class _EventBannerCard extends StatelessWidget {
 
                         // Register Button
                         ElevatedButton(
-                          onPressed: () {
-                            debugPrint('Register Now: ${event.title}');
-                          },
+                          onPressed: () {},
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.white,
                             foregroundColor: AppColors.primaryDark,
@@ -605,7 +538,7 @@ class _CategoryGrid extends StatelessWidget {
   }
 }
 
-/// Single Complaint Category Card Widget
+/// Single Complaint Category Card Widget (White with 85% opacity, rounded corners, soft shadow)
 class _CategoryCard extends StatelessWidget {
   final _CategoryData category;
 
@@ -615,7 +548,7 @@ class _CategoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.card,
+        color: AppColors.white.withAlpha(217),
         borderRadius: AppRadius.mediumBorderRadius,
         boxShadow: AppShadows.light,
       ),
