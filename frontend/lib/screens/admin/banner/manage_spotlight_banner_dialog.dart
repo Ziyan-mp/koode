@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'active_banners_screen.dart'; // We will create this next!
+import 'package:flutter/material.dart'; // FIXED: Lowercase 'i'
+// import 'active_banners_screen.dart'; // TEMPORARILY HIDDEN: Until you create this file!
 
 class ManageSpotlightBannerDialog extends StatefulWidget {
   const ManageSpotlightBannerDialog({super.key});
@@ -50,7 +50,7 @@ class _ManageSpotlightBannerDialogState
               ),
               const SizedBox(height: 16),
 
-              // Upload Box (Only Image Banner is assumed now)
+              // Upload Box
               const Text("Upload Banner Image (Required)",
                   style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
               const SizedBox(height: 6),
@@ -139,14 +139,17 @@ class _ManageSpotlightBannerDialogState
                 width: double.infinity,
                 child: TextButton.icon(
                   onPressed: () {
-                    // Close dialog and open the Manage Banners page
+                    // Temporarily just closes the dialog until the screen is built
                     Navigator.pop(context);
+                    
+                    /* UNCOMMENT THIS LATER ONCE THE SCREEN IS BUILT
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => const ActiveBannersScreen(),
                       ),
                     );
+                    */
                   },
                   icon: const Icon(Icons.settings, color: Color(0xFF004D61)),
                   label: const Text(
