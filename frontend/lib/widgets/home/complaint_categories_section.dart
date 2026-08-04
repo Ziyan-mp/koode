@@ -6,7 +6,7 @@ import '../../config/app_spacing.dart';
 import '../../config/app_text_styles.dart';
 import '../../screens/complaints/create_complaint_screen.dart';
 
-/// Reusable Complaint Categories Section widget for Home Screen
+/// Reusable Complaint Categories Section widget for Complaints Screen
 class ComplaintCategoriesSection extends StatelessWidget {
   final ValueChanged<String>? onCategorySelected;
 
@@ -15,59 +15,53 @@ class ComplaintCategoriesSection extends StatelessWidget {
     this.onCategorySelected,
   });
 
+  static const List<_CategoryItem> _categories = [
+    _CategoryItem(title: 'Academic', icon: Icons.school_outlined),
+    _CategoryItem(title: 'Classroom', icon: Icons.class_outlined),
+    _CategoryItem(title: 'Laboratory', icon: Icons.science_outlined),
+    _CategoryItem(title: 'Hostel', icon: Icons.apartment_outlined),
+    _CategoryItem(title: 'Library', icon: Icons.menu_book_outlined),
+    _CategoryItem(title: 'Bus', icon: Icons.directions_bus_outlined),
+    _CategoryItem(title: 'Electricity', icon: Icons.bolt_outlined),
+    _CategoryItem(title: 'Water', icon: Icons.water_drop_outlined),
+    _CategoryItem(title: 'Canteen', icon: Icons.restaurant_outlined),
+    _CategoryItem(title: 'Cleanliness', icon: Icons.cleaning_services_outlined),
+    _CategoryItem(title: 'Sports', icon: Icons.sports_soccer_outlined),
+    _CategoryItem(title: 'Internet', icon: Icons.wifi_outlined),
+    _CategoryItem(title: 'Infrastructure', icon: Icons.domain_outlined),
+    _CategoryItem(title: 'Others', icon: Icons.more_horiz_outlined),
+  ];
+
   @override
   Widget build(BuildContext context) {
-    final categories = const [
-      _CategoryItem(
-        title: 'Academic',
-        icon: Icons.school_outlined,
-      ),
-      _CategoryItem(
-        title: 'Hostel',
-        icon: Icons.apartment_outlined,
-      ),
-      _CategoryItem(
-        title: 'Transport',
-        icon: Icons.directions_bus_outlined,
-      ),
-      _CategoryItem(
-        title: 'Library',
-        icon: Icons.menu_book_outlined,
-      ),
-      _CategoryItem(
-        title: 'Cafeteria',
-        icon: Icons.restaurant_outlined,
-      ),
-      _CategoryItem(
-        title: 'Infrastructure',
-        icon: Icons.domain_outlined,
-      ),
-      _CategoryItem(
-        title: 'Others',
-        icon: Icons.more_horiz,
-      ),
-    ];
+    final size = MediaQuery.of(context).size;
+    final isTablet = size.width >= 600;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
           'Complaint Categories',
-          style: AppTextStyles.subHeading,
+          style: AppTextStyles.heading,
+        ),
+        AppSpacing.xsHeight,
+        const Text(
+          'Select a category to submit your complaint',
+          style: AppTextStyles.caption,
         ),
         AppSpacing.mdHeight,
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: categories.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
+          itemCount: _categories.length,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: isTablet ? 4 : 2,
             crossAxisSpacing: 16,
             mainAxisSpacing: 16,
-            childAspectRatio: 1.35,
+            childAspectRatio: isTablet ? 1.4 : 1.35,
           ),
           itemBuilder: (context, index) {
-            final category = categories[index];
+            final category = _categories[index];
             return _CategoryCard(
               category: category,
               onTap: () {
@@ -115,7 +109,7 @@ class _CategoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.card,
+        color: AppColors.white.withAlpha(217),
         borderRadius: AppRadius.mediumBorderRadius,
         boxShadow: AppShadows.light,
       ),

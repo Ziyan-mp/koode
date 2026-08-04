@@ -3,6 +3,9 @@ import '../../config/app_colors.dart';
 import '../../config/app_radius.dart';
 import '../../config/app_spacing.dart';
 import '../../config/app_text_styles.dart';
+import '../../models/complaint_model.dart';
+import '../../services/auth_service.dart';
+import '../../services/complaint_service.dart';
 import '../../utils/validators.dart';
 import '../../widgets/common/app_logo.dart';
 import '../../widgets/common/app_background.dart';
@@ -68,9 +71,19 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
     super.initState();
     _titleController.addListener(_onFormFieldChanged);
     _locationController.addListener(_onFormFieldChanged);
-    if (widget.selectedCategory != null &&
-        _categories.contains(widget.selectedCategory)) {
+    if (widget.selectedCategory != null) {
       _selectedCategory = widget.selectedCategory;
+    }
+  }
+
+  @override
+  void didUpdateWidget(CreateComplaintScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.selectedCategory != oldWidget.selectedCategory &&
+        widget.selectedCategory != null) {
+      setState(() {
+        _selectedCategory = widget.selectedCategory;
+      });
     }
   }
 
@@ -88,6 +101,11 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
     super.dispose();
   }
 
+  String _monthName(int month) {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return months[month - 1];
+  }
+
   void _submitComplaint() async {
     // Dismiss keyboard when submit is pressed
     FocusScope.of(context).unfocus();
@@ -97,8 +115,33 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
         _isLoading = true;
       });
 
-      // Simulate 2 seconds loading state
-      await Future.delayed(const Duration(seconds: 2));
+      final user = await AuthService().getCurrentUser();
+      final userEmail = user?.email ?? 'student@koode.com';
+      final now = DateTime.now();
+      final dateStr = '${now.day} ${_monthName(now.month)} ${now.year}';
+      final complaintId = 'CMP-${now.millisecondsSinceEpoch.toString().substring(7)}';
+
+      final complaint = ComplaintModel(
+        id: complaintId,
+        category: _selectedCategory ?? 'General',
+        title: _titleController.text.trim(),
+        description: _descriptionController.text.trim(),
+        status: 'Pending',
+        dateSubmitted: dateStr,
+        userEmail: userEmail,
+        location: _locationController.text.trim().isNotEmpty ? _locationController.text.trim() : null,
+        priority: _selectedPriority,
+        attachments: _selectedFileName != null ? [_selectedFileName!] : [],
+        timeline: [
+          ComplaintTimelineEvent(
+            status: 'Pending',
+            date: dateStr,
+            note: 'Complaint submitted successfully.',
+          ),
+        ],
+      );
+
+      await ComplaintService().submitComplaint(complaint);
 
       if (!mounted) return;
 

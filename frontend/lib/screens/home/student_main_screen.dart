@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../config/app_colors.dart';
-import '../complaints/create_complaint_screen.dart';
 import '../complaints/my_complaints_screen.dart';
-import '../notices/notices_screen.dart';
+import '../notes/notes_screen.dart';
 import '../profile/profile_screen.dart';
 import 'home_screen.dart';
 
@@ -19,12 +18,11 @@ class _StudentMainScreenState extends State<StudentMainScreen> {
   // Currently active tab index
   int _selectedIndex = 0;
 
-  // Pages corresponding to each BottomNavigationBar tab
+  // Pages corresponding to each BottomNavigationBar tab (Home, Complaints, Notes, Profile)
   final List<Widget> _pages = const [
     HomeScreen(),
     MyComplaintsScreen(),
-    CreateComplaintScreen(),
-    NoticesScreen(),
+    NotesScreen(),
     ProfileScreen(),
   ];
 
@@ -77,14 +75,9 @@ class _StudentMainScreenState extends State<StudentMainScreen> {
               label: 'Complaints',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.add_circle_outline),
-              activeIcon: Icon(Icons.add_circle),
-              label: 'Create',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.campaign_outlined),
-              activeIcon: Icon(Icons.campaign),
-              label: 'Notices',
+              icon: Icon(Icons.note_alt_outlined),
+              activeIcon: Icon(Icons.note_alt),
+              label: 'Notes',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person_outline),

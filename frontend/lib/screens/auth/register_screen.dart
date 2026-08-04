@@ -6,6 +6,8 @@ import '../../config/app_routes.dart';
 import '../../config/app_shadows.dart';
 import '../../config/app_spacing.dart';
 import '../../config/app_text_styles.dart';
+import '../../models/user_model.dart';
+import '../../services/auth_service.dart';
 import '../../utils/validators.dart';
 import '../../widgets/common/app_background.dart';
 import '../../widgets/common/app_logo.dart';
@@ -22,17 +24,20 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   // Form Key for validation
   final _formKey = GlobalKey<FormState>();
+  final AuthService _authService = AuthService();
 
   // Screen State Variables
   bool _isLoading = false;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   String? _selectedDepartment;
+  String? _selectedYearSemester;
 
   final _fullNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneNumberController = TextEditingController();
   final _departmentController = TextEditingController();
+  final _yearSemesterController = TextEditingController();
   final _studentIdController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -49,19 +54,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
     'Other',
   ];
 
+  final List<String> _yearSemesters = const [
+    'Year 1 / Semester 1',
+    'Year 1 / Semester 2',
+    'Year 2 / Semester 3',
+    'Year 2 / Semester 4',
+    'Year 3 / Semester 5',
+    'Year 3 / Semester 6',
+    'Year 4 / Semester 7',
+    'Year 4 / Semester 8',
+  ];
+
   @override
   void dispose() {
     _fullNameController.dispose();
     _emailController.dispose();
     _phoneNumberController.dispose();
     _departmentController.dispose();
+    _yearSemesterController.dispose();
     _studentIdController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  /// Handles Form Validation, Focus Unfocusing, and Simulated Registration
+  /// Handles Form Validation and User Registration
   Future<void> _register() async {
     // Dismiss active keyboard
     FocusScope.of(context).unfocus();
@@ -71,14 +88,42 @@ class _RegisterScreenState extends State<RegisterScreen> {
         _isLoading = true;
       });
 
-      // Simulate async registration API call
-      await Future.delayed(const Duration(seconds: 2));
+      final user = UserModel(
+        fullName: _fullNameController.text.trim(),
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+        department: _selectedDepartment ?? _departmentController.text.trim(),
+        yearSemester: _selectedYearSemester ?? _yearSemesterController.text.trim(),
+        studentId: _studentIdController.text.trim(),
+        phoneNumber: _phoneNumberController.text.trim(),
+      );
+
+      final result = await _authService.register(user);
 
       if (mounted) {
         setState(() {
           _isLoading = false;
         });
-        debugPrint("Registration Successful");
+
+        if (result.status == AuthStatus.success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result.message),
+              backgroundColor: Colors.green,
+            ),
+          );
+          Navigator.pushReplacementNamed(
+            context,
+            AppRoutes.login,
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result.message),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
     }
   }
@@ -228,15 +273,73 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                               AppSpacing.mdHeight,
 
+                              DropdownButtonFormField<String>(
+                                initialValue: _selectedYearSemester,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedYearSemester = value;
+                                    _yearSemesterController.text = value ?? '';
+                                  });
+                                },
+                                validator: (value) => Validators.requiredField(
+                                  value,
+                                  fieldName: 'Year / Semester',
+                                ),
+                                decoration: const InputDecoration(
+                                  labelText: 'Year / Semester',
+                                  hintText: 'Select your year & semester',
+                                  prefixIcon: Icon(
+                                    Icons.calendar_today_outlined,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                  filled: true,
+                                  fillColor: AppColors.surface,
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 18,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: AppRadius.mediumBorderRadius,
+                                    borderSide: BorderSide(color: AppColors.border),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: AppRadius.mediumBorderRadius,
+                                    borderSide: BorderSide(color: AppColors.border),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: AppRadius.mediumBorderRadius,
+                                    borderSide: BorderSide(
+                                      color: AppColors.primary,
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  errorBorder: OutlineInputBorder(
+                                    borderRadius: AppRadius.mediumBorderRadius,
+                                    borderSide: BorderSide(color: AppColors.error),
+                                  ),
+                                ),
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  color: AppColors.textPrimary,
+                                ),
+                                items: _yearSemesters.map((ys) {
+                                  return DropdownMenuItem<String>(
+                                    value: ys,
+                                    child: Text(ys),
+                                  );
+                                }).toList(),
+                              ),
+                              AppSpacing.mdHeight,
+
                               CustomTextField(
                                 controller: _studentIdController,
-                                labelText: 'Student ID',
-                                hintText: 'Enter your student ID',
+                                labelText: 'Register Number / Student ID',
+                                hintText: 'Enter your register number',
                                 prefixIcon: Icons.badge_outlined,
                                 keyboardType: TextInputType.text,
                                 validator: (value) => Validators.requiredField(
                                   value,
-                                  fieldName: 'Student ID',
+                                  fieldName: 'Register Number',
                                 ),
                               ),
                               AppSpacing.mdHeight,

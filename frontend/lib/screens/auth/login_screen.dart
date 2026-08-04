@@ -6,6 +6,8 @@ import '../../config/app_routes.dart';
 import '../../config/app_shadows.dart';
 import '../../config/app_spacing.dart';
 import '../../config/app_text_styles.dart';
+import '../../services/auth_service.dart';
+import '../../utils/validators.dart';
 import '../../widgets/common/app_background.dart';
 import '../../widgets/common/app_logo.dart';
 import '../../widgets/common/custom_text_field.dart';
@@ -20,15 +22,57 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final AuthService _authService = AuthService();
+
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _isLoading = false;
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _login() async {
+    FocusScope.of(context).unfocus();
+
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      final email = _emailController.text.trim();
+      final password = _passwordController.text;
+
+      final result = await _authService.login(
+        email: email,
+        password: password,
+      );
+
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+
+        if (result.status == AuthStatus.success) {
+          Navigator.pushReplacementNamed(
+            context,
+            AppRoutes.home,
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result.message),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
   }
 
   @override
@@ -72,130 +116,131 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           boxShadow: AppShadows.medium,
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Welcome Back',
-                              style: AppTextStyles.heading,
-                            ),
-                            AppSpacing.xsHeight,
-                            const Text(
-                              'Sign in to access your campus dashboard',
-                              style: AppTextStyles.caption,
-                            ),
-                            AppSpacing.lgHeight,
-
-                            // Student Email Field
-                            CustomTextField(
-                              controller: _emailController,
-                              labelText: 'Student Email',
-                              hintText: 'student@campus.edu',
-                              prefixIcon: Icons.email_outlined,
-                              keyboardType: TextInputType.emailAddress,
-                            ),
-                            AppSpacing.mdHeight,
-
-                            // Password Field
-                            CustomTextField(
-                              controller: _passwordController,
-                              labelText: 'Password',
-                              hintText: '••••••••',
-                              prefixIcon: Icons.lock_outline,
-                              obscureText: _obscurePassword,
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _obscurePassword
-                                      ? Icons.visibility_off_outlined
-                                      : Icons.visibility_outlined,
-                                  color: AppColors.textSecondary,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _obscurePassword = !_obscurePassword;
-                                  });
-                                },
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Welcome Back',
+                                style: AppTextStyles.heading,
                               ),
-                            ),
-                            AppSpacing.xsHeight,
+                              AppSpacing.xsHeight,
+                              const Text(
+                                'Sign in to access your campus dashboard',
+                                style: AppTextStyles.caption,
+                              ),
+                              AppSpacing.lgHeight,
 
-                            // Forgot Password Button
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: TextButton(
-                                onPressed: () {},
-                                child: Text(
-                                  'Forgot Password?',
-                                  style: AppTextStyles.caption.copyWith(
-                                    color: AppColors.primary,
-                                    fontWeight: FontWeight.w600,
+                              // Student Email Field
+                              CustomTextField(
+                                controller: _emailController,
+                                labelText: 'Student Email',
+                                hintText: 'student@campus.edu',
+                                prefixIcon: Icons.email_outlined,
+                                keyboardType: TextInputType.emailAddress,
+                                validator: Validators.email,
+                              ),
+                              AppSpacing.mdHeight,
+
+                              // Password Field
+                              CustomTextField(
+                                controller: _passwordController,
+                                labelText: 'Password',
+                                hintText: '••••••••',
+                                prefixIcon: Icons.lock_outline,
+                                obscureText: _obscurePassword,
+                                validator: Validators.password,
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscurePassword
+                                        ? Icons.visibility_off_outlined
+                                        : Icons.visibility_outlined,
+                                    color: AppColors.textSecondary,
                                   ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscurePassword = !_obscurePassword;
+                                    });
+                                  },
                                 ),
                               ),
-                            ),
-                            AppSpacing.mdHeight,
+                              AppSpacing.xsHeight,
 
-                            // Primary Login Button
-                            PrimaryButton(
-                              text: 'LOGIN',
-                              onPressed: () {
-                                Navigator.pushReplacementNamed(
-                                  context,
-                                  AppRoutes.home,
-                                );
-                              },
-                            ),
-                            AppSpacing.mdHeight,
-
-                            // Register Navigation Link
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Text(
-                                  "Don't have an account?",
-                                  style: AppTextStyles.caption,
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pushNamed(
-                                      context,
-                                      AppRoutes.register,
-                                    );
-                                  },
+                              // Forgot Password Button
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: TextButton(
+                                  onPressed: () {},
                                   child: Text(
-                                    'Register',
+                                    'Forgot Password?',
                                     style: AppTextStyles.caption.copyWith(
                                       color: AppColors.primary,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                              AppSpacing.mdHeight,
 
-                            const SizedBox(height: 15), 
-                            
-                            // Admin Login Button
-                            TextButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const AdminLoginScreen(),
+                              // Primary Login Button
+                              PrimaryButton(
+                                text: 'LOGIN',
+                                isLoading: _isLoading,
+                                onPressed: _login,
+                              ),
+                              AppSpacing.mdHeight,
+
+                              // Register Navigation Link
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text(
+                                    "Don't have an account?",
+                                    style: AppTextStyles.caption,
                                   ),
-                                );
-                              },
-                              child: const Text(
-                                "Login as Admin",
-                                style: TextStyle(
-                                  color: Colors.blueGrey, 
-                                  fontWeight: FontWeight.bold,
-                                  decoration: TextDecoration.underline,
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        AppRoutes.register,
+                                      );
+                                    },
+                                    child: Text(
+                                      'Register',
+                                      style: AppTextStyles.caption.copyWith(
+                                        color: AppColors.primary,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              const SizedBox(height: 15),
+
+                              // Admin Login Button
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const AdminLoginScreen(),
+                                    ),
+                                  );
+                                },
+                                child: const Text(
+                                  "Login as Admin",
+                                  style: TextStyle(
+                                    color: Colors.blueGrey,
+                                    fontWeight: FontWeight.bold,
+                                    decoration: TextDecoration.underline,
+                                  ),
                                 ),
                               ),
-                            ),
-
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),

@@ -23,9 +23,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Timer? _bannerTimer;
   int _currentBannerIndex = 0;
 
-  // Bottom Navigation Index
-  int _selectedBottomNavIndex = 0;
-
   // Event Banner Dummy Data
   final List<_EventBannerItem> _events = const [
     _EventBannerItem(
@@ -62,22 +59,6 @@ class _HomeScreenState extends State<HomeScreen> {
     ),
   ];
 
-  // 12 Complaint Categories Data
-  final List<_CategoryData> _categories = const [
-    _CategoryData(title: 'Classroom', icon: Icons.class_outlined),
-    _CategoryData(title: 'Laboratory', icon: Icons.science_outlined),
-    _CategoryData(title: 'Library', icon: Icons.menu_book_outlined),
-    _CategoryData(title: 'Hostel', icon: Icons.apartment_outlined),
-    _CategoryData(title: 'Bus', icon: Icons.directions_bus_outlined),
-    _CategoryData(title: 'Electricity', icon: Icons.bolt_outlined),
-    _CategoryData(title: 'Water', icon: Icons.water_drop_outlined),
-    _CategoryData(title: 'Canteen', icon: Icons.restaurant_outlined),
-    _CategoryData(title: 'Cleanliness', icon: Icons.cleaning_services_outlined),
-    _CategoryData(title: 'Sports', icon: Icons.sports_soccer_outlined),
-    _CategoryData(title: 'Internet', icon: Icons.wifi_outlined),
-    _CategoryData(title: 'Others', icon: Icons.more_horiz_outlined),
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -104,9 +85,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final isTablet = size.width >= 600;
-
     return Scaffold(
       body: AppBackground(
         child: SafeArea(
@@ -117,11 +95,11 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Section 1: Welcome Header
-                const _WelcomeHeader(studentName: 'Labeeba'),
+                const _WelcomeHeader(studentName: 'Student'),
 
                 AppSpacing.lgHeight,
 
-                // Section 2 & 3: Auto Sliding Event Banner (Height 200)
+                // Section 2: Auto Sliding Event Banner (Height 200)
                 _EventBannerSlider(
                   events: _events,
                   pageController: _pageController,
@@ -134,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 AppSpacing.smHeight,
 
-                // Section 4: Animated Page Indicator
+                // Section 3: Animated Page Indicator
                 _PageIndicator(
                   count: _events.length,
                   currentIndex: _currentBannerIndex,
@@ -142,20 +120,47 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 AppSpacing.lgHeight,
 
-                // Section 5: Complaint Categories Grid
-                const Text(
-                  'Complaint Categories',
-                  style: AppTextStyles.heading,
+                // Section 4: Quick Overview Card / Notice Preview
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20.0),
+                  decoration: BoxDecoration(
+                    color: AppColors.white.withAlpha(217),
+                    borderRadius: AppRadius.largeBorderRadius,
+                    boxShadow: AppShadows.light,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.campaign_outlined,
+                            color: AppColors.primary,
+                            size: 24,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Campus Announcements',
+                            style: AppTextStyles.subHeading.copyWith(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      AppSpacing.xsHeight,
+                      Text(
+                        'Stay updated with the latest campus notifications and activity updates.',
+                        style: AppTextStyles.caption.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
 
-                AppSpacing.mdHeight,
-
-                _CategoryGrid(
-                  categories: _categories,
-                  isTablet: isTablet,
-                ),
-
-                // Bottom Spacing for FAB & Navigation
+                // Bottom Spacing for FAB
                 const SizedBox(height: 80),
               ],
             ),
@@ -163,7 +168,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
 
-      // Section 6: Floating Action Button
+      // Floating Action Button to create a new complaint
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
@@ -181,45 +186,6 @@ class _HomeScreenState extends State<HomeScreen> {
           color: AppColors.white,
           size: 28,
         ),
-      ),
-
-      // Section 7: Material 3 Bottom Navigation Bar
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedBottomNavIndex,
-        onTap: (index) {
-          setState(() {
-            _selectedBottomNavIndex = index;
-          });
-        },
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: AppColors.surface.withAlpha(240),
-        selectedItemColor: AppColors.primary,
-        unselectedItemColor: AppColors.grey,
-        selectedFontSize: 12,
-        unselectedFontSize: 12,
-        elevation: 10,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.assignment_outlined),
-            activeIcon: Icon(Icons.assignment),
-            label: 'Complaints',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add_circle_outline),
-            activeIcon: Icon(Icons.add_circle),
-            label: 'Create',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
       ),
     );
   }
@@ -508,102 +474,6 @@ class _PageIndicator extends StatelessWidget {
   }
 }
 
-/// Responsive Grid View of Complaint Categories
-class _CategoryGrid extends StatelessWidget {
-  final List<_CategoryData> categories;
-  final bool isTablet;
-
-  const _CategoryGrid({
-    required this.categories,
-    required this.isTablet,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: categories.length,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: isTablet ? 4 : 2,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-        childAspectRatio: isTablet ? 1.4 : 1.35,
-      ),
-      itemBuilder: (context, index) {
-        final category = categories[index];
-        return _CategoryCard(category: category);
-      },
-    );
-  }
-}
-
-/// Single Complaint Category Card Widget (White with 85% opacity, rounded corners, soft shadow)
-class _CategoryCard extends StatelessWidget {
-  final _CategoryData category;
-
-  const _CategoryCard({required this.category});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.white.withAlpha(217),
-        borderRadius: AppRadius.mediumBorderRadius,
-        boxShadow: AppShadows.light,
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: AppRadius.mediumBorderRadius,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => CreateComplaintScreen(
-                  selectedCategory: category.title,
-                ),
-              ),
-            );
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: const BoxDecoration(
-                    color: AppColors.primaryLight,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    category.icon,
-                    color: AppColors.primary,
-                    size: 26,
-                  ),
-                ),
-                AppSpacing.smHeight,
-                Text(
-                  category.title,
-                  style: AppTextStyles.title.copyWith(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 /// Data Model for Event Banner
 class _EventBannerItem {
   final String title;
@@ -619,17 +489,6 @@ class _EventBannerItem {
     required this.location,
     required this.description,
     required this.gradientColors,
-    required this.icon,
-  });
-}
-
-/// Data Model for Complaint Category
-class _CategoryData {
-  final String title;
-  final IconData icon;
-
-  const _CategoryData({
-    required this.title,
     required this.icon,
   });
 }
