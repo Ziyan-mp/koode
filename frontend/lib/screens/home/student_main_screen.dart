@@ -15,16 +15,8 @@ class StudentMainScreen extends StatefulWidget {
 }
 
 class _StudentMainScreenState extends State<StudentMainScreen> {
-  // Currently active tab index
+  // Currently active tab index (0: Home, 1: Complaints, 2: Notes, 3: Profile)
   int _selectedIndex = 0;
-
-  // Pages corresponding to each BottomNavigationBar tab (Home, Complaints, Notes, Profile)
-  final List<Widget> _pages = const [
-    HomeScreen(),
-    MyComplaintsScreen(),
-    NotesScreen(),
-    ProfileScreen(),
-  ];
 
   /// Updates selected tab index
   void _onItemTapped(int index) {
@@ -35,11 +27,22 @@ class _StudentMainScreenState extends State<StudentMainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Pages corresponding to each BottomNavigationBar tab (Home, Complaints, Notes, Profile)
+    final List<Widget> pages = [
+      HomeScreen(
+        onFileComplaintTap: () => _onItemTapped(1),
+        onAcademicsTap: () => _onItemTapped(2),
+      ),
+      const MyComplaintsScreen(),
+      const NotesScreen(),
+      const ProfileScreen(),
+    ];
+
     return Scaffold(
       // IndexedStack preserves state across tab switches
       body: IndexedStack(
         index: _selectedIndex,
-        children: _pages,
+        children: pages,
       ),
 
       // Material 3 Styled Bottom Navigation Bar

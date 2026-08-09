@@ -6,12 +6,24 @@ import '../../config/app_radius.dart';
 import '../../config/app_shadows.dart';
 import '../../config/app_spacing.dart';
 import '../../config/app_text_styles.dart';
+import '../../models/user_model.dart';
+import '../../services/auth_service.dart';
+import '../../utils/greeting_helper.dart';
 import '../../widgets/common/app_background.dart';
+import '../../widgets/home/home_action_card.dart';
 import '../complaints/create_complaint_screen.dart';
+import '../notes/notes_screen.dart';
 
 /// Production-Grade Home Screen for Koode – Your Voice, Your Campus
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final VoidCallback? onFileComplaintTap;
+  final VoidCallback? onAcademicsTap;
+
+  const HomeScreen({
+    super.key,
+    this.onFileComplaintTap,
+    this.onAcademicsTap,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -23,7 +35,14 @@ class _HomeScreenState extends State<HomeScreen> {
   Timer? _bannerTimer;
   int _currentBannerIndex = 0;
 
-  // Event Banner Dummy Data
+  final AuthService _authService = AuthService();
+  UserModel? _currentUser;
+
+  String get _displayName => _currentUser?.fullName.trim().isNotEmpty == true
+      ? _currentUser!.fullName.trim()
+      : 'Student';
+
+  // Event Banner Data
   final List<_EventBannerItem> _events = const [
     _EventBannerItem(
       title: 'Annual Cultural Fest',
@@ -62,6 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _loadCurrentUser();
     _pageController = PageController();
 
     // Auto-slide banner every 5 seconds
@@ -76,6 +96,15 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Future<void> _loadCurrentUser() async {
+    final user = await _authService.getCurrentUser();
+    if (mounted && user != null) {
+      setState(() {
+        _currentUser = user;
+      });
+    }
+  }
+
   @override
   void dispose() {
     _bannerTimer?.cancel();
@@ -83,8 +112,38 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
+  void _handleAcademicsTap() {
+    if (widget.onAcademicsTap != null) {
+      widget.onAcademicsTap!();
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const NotesScreen(),
+        ),
+      );
+    }
+  }
+
+  void _handleFileComplaintTap() {
+    if (widget.onFileComplaintTap != null) {
+      widget.onFileComplaintTap!();
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const CreateComplaintScreen(),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallMobile = screenWidth < 360;
+    final greetingPrefix = GreetingHelper.getGreetingPrefix();
+
     return Scaffold(
       body: AppBackground(
         child: SafeArea(
@@ -94,8 +153,11 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Section 1: Welcome Header
-                const _WelcomeHeader(studentName: 'Student'),
+                // Section 1: Welcome Header with dynamic greeting and user name
+                _WelcomeHeader(
+                  greeting: greetingPrefix,
+                  studentName: _displayName,
+                ),
 
                 AppSpacing.lgHeight,
 
@@ -120,7 +182,65 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 AppSpacing.lgHeight,
 
-                // Section 4: Quick Overview Card / Notice Preview
+                // Section 4: Prominent Quick Action Cards (Academics & File a Complaint)
+                const Text(
+                  'Quick Actions',
+                  style: AppTextStyles.subHeading,
+                ),
+                AppSpacing.mdHeight,
+
+                if (isSmallMobile)
+                  Column(
+                    children: [
+                      HomeActionCard(
+                        title: 'Academics',
+                        subtitle: 'Access study materials and notes.',
+                        icon: Icons.school_outlined,
+                        iconColor: AppColors.primary,
+                        iconBackgroundColor: AppColors.primaryLight,
+                        onTap: _handleAcademicsTap,
+                      ),
+                      AppSpacing.mdHeight,
+                      HomeActionCard(
+                        title: 'File a Complaint',
+                        subtitle: 'Report campus issues.',
+                        icon: Icons.campaign_outlined,
+                        iconColor: Colors.orange.shade700,
+                        iconBackgroundColor: Colors.orange.shade50,
+                        onTap: _handleFileComplaintTap,
+                      ),
+                    ],
+                  )
+                else
+                  Row(
+                    children: [
+                      Expanded(
+                        child: HomeActionCard(
+                          title: 'Academics',
+                          subtitle: 'Access study materials and notes.',
+                          icon: Icons.school_outlined,
+                          iconColor: AppColors.primary,
+                          iconBackgroundColor: AppColors.primaryLight,
+                          onTap: _handleAcademicsTap,
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: HomeActionCard(
+                          title: 'File a Complaint',
+                          subtitle: 'Report campus issues.',
+                          icon: Icons.campaign_outlined,
+                          iconColor: Colors.orange.shade700,
+                          iconBackgroundColor: Colors.orange.shade50,
+                          onTap: _handleFileComplaintTap,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                AppSpacing.lgHeight,
+
+                // Section 5: Campus Announcements Overview Card
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(20.0),
@@ -135,7 +255,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Row(
                         children: [
                           const Icon(
-                            Icons.campaign_outlined,
+                            Icons.notifications_active_outlined,
                             color: AppColors.primary,
                             size: 24,
                           ),
@@ -151,7 +271,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       AppSpacing.xsHeight,
                       Text(
-                        'Stay updated with the latest campus notifications and activity updates.',
+                        'Stay updated with the latest campus notifications, events, and academic schedules.',
                         style: AppTextStyles.caption.copyWith(
                           color: AppColors.textSecondary,
                         ),
@@ -160,31 +280,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
 
-                // Bottom Spacing for FAB
                 const SizedBox(height: 80),
               ],
             ),
           ),
-        ),
-      ),
-
-      // Floating Action Button to create a new complaint
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const CreateComplaintScreen(),
-            ),
-          );
-        },
-        backgroundColor: AppColors.primary,
-        elevation: 6,
-        shape: const CircleBorder(),
-        child: const Icon(
-          Icons.add,
-          color: AppColors.white,
-          size: 28,
         ),
       ),
     );
@@ -195,11 +294,15 @@ class _HomeScreenState extends State<HomeScreen> {
  * Helper Widgets & Data Models
  * ============================================================================ */
 
-/// Welcome Header Section (Good Morning 👋, Student Name, Avatar with Logo)
+/// Welcome Header Section (Dynamic Greeting, Student Name, Avatar with Logo)
 class _WelcomeHeader extends StatelessWidget {
+  final String greeting;
   final String studentName;
 
-  const _WelcomeHeader({required this.studentName});
+  const _WelcomeHeader({
+    required this.greeting,
+    required this.studentName,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -219,7 +322,7 @@ class _WelcomeHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Good Morning 👋',
+                  '$greeting 👋',
                   style: AppTextStyles.body.copyWith(
                     color: AppColors.textSecondary,
                     fontWeight: FontWeight.w500,
@@ -300,7 +403,6 @@ class _EventBannerCard extends StatelessWidget {
         borderRadius: AppRadius.largeBorderRadius,
         child: Stack(
           children: [
-            // Decorative background pattern circles
             Positioned(
               right: -30,
               top: -30,
@@ -325,8 +427,6 @@ class _EventBannerCard extends StatelessWidget {
                 ),
               ),
             ),
-
-            // Main Content
             Padding(
               padding: const EdgeInsets.all(20.0),
               child: Row(
@@ -336,7 +436,6 @@ class _EventBannerCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Event Date & Location Tag
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
@@ -364,8 +463,6 @@ class _EventBannerCard extends StatelessWidget {
                           ),
                         ),
                         AppSpacing.smHeight,
-
-                        // Title
                         Text(
                           event.title,
                           style: AppTextStyles.title.copyWith(
@@ -377,8 +474,6 @@ class _EventBannerCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 4),
-
-                        // Subtitle
                         Text(
                           event.description,
                           style: AppTextStyles.caption.copyWith(
@@ -389,8 +484,6 @@ class _EventBannerCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                         AppSpacing.smHeight,
-
-                        // Register Button
                         ElevatedButton(
                           onPressed: () {},
                           style: ElevatedButton.styleFrom(
@@ -414,8 +507,6 @@ class _EventBannerCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
-
-                  // Event Theme Icon Container
                   Container(
                     width: 64,
                     height: 64,

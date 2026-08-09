@@ -306,10 +306,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           icon: Icons.privacy_tip_outlined,
                           title: 'Privacy Policy',
                           onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Koode Privacy Policy v1.0'),
-                              ),
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.privacyPolicy,
                             );
                           },
                         ),
@@ -330,12 +329,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           icon: Icons.info_outline,
                           title: 'About Koode',
                           onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'Koode v1.0.0 – Campus Management System',
-                                ),
-                              ),
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.aboutKoode,
                             );
                           },
                         ),

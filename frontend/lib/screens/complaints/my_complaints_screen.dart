@@ -11,6 +11,7 @@ import '../../services/complaint_service.dart';
 import '../../widgets/common/app_background.dart';
 import '../../widgets/home/complaint_categories_section.dart';
 import 'complaint_details_screen.dart';
+import 'create_complaint_screen.dart';
 
 class MyComplaintsScreen extends StatefulWidget {
   const MyComplaintsScreen({super.key});
@@ -110,8 +111,18 @@ class _MyComplaintsScreenState extends State<MyComplaintsScreen> {
 
                   // Section 1: Complaint Categories Section for submitting new complaints
                   ComplaintCategoriesSection(
-                    onCategorySelected: (category) {
-                      // Handled by ComplaintCategoriesSection internally
+                    onCategorySelected: (category) async {
+                      final result = await Navigator.push<bool>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CreateComplaintScreen(
+                            selectedCategory: category,
+                          ),
+                        ),
+                      );
+                      if (result == true) {
+                        _loadUserComplaints();
+                      }
                     },
                   ),
 

@@ -6,7 +6,7 @@ void main() {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const KoodeApp());
 
-    // Verify that Koode title text is present.
-    expect(find.text('Koode'), findsOneWidget);
+    // Verify that the tagline text is present.
+    expect(find.text('Your Voice, Your Campus'), findsOneWidget);
   });
 }

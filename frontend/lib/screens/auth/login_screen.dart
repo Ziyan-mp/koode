@@ -12,7 +12,6 @@ import '../../widgets/common/app_background.dart';
 import '../../widgets/common/app_logo.dart';
 import '../../widgets/common/custom_text_field.dart';
 import '../../widgets/common/primary_button.dart';
-import '../admin/auth/admin_login_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -171,7 +170,12 @@ class _LoginScreenState extends State<LoginScreen> {
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: TextButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      AppRoutes.forgotPassword,
+                                    );
+                                  },
                                   child: Text(
                                     'Forgot Password?',
                                     style: AppTextStyles.caption.copyWith(
@@ -220,22 +224,21 @@ class _LoginScreenState extends State<LoginScreen> {
                               const SizedBox(height: 15),
 
                               // Admin Login Button
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const AdminLoginScreen(),
+                              Center(
+                                child: TextButton(
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      AppRoutes.adminLogin,
+                                    );
+                                  },
+                                  child: const Text(
+                                    "Login as Admin",
+                                    style: TextStyle(
+                                      color: Colors.blueGrey,
+                                      fontWeight: FontWeight.bold,
+                                      decoration: TextDecoration.underline,
                                     ),
-                                  );
-                                },
-                                child: const Text(
-                                  "Login as Admin",
-                                  style: TextStyle(
-                                    color: Colors.blueGrey,
-                                    fontWeight: FontWeight.bold,
-                                    decoration: TextDecoration.underline,
                                   ),
                                 ),
                               ),

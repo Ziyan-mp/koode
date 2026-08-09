@@ -1,29 +1,28 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import '../../config/app_colors.dart';
-import '../../config/app_radius.dart';
-import '../../config/app_routes.dart';
-import '../../config/app_shadows.dart';
-import '../../config/app_spacing.dart';
-import '../../config/app_text_styles.dart';
-import '../../services/auth_service.dart';
-import '../../utils/validators.dart';
-import '../../widgets/common/app_background.dart';
-import '../../widgets/common/app_logo.dart';
-import '../../widgets/common/custom_text_field.dart';
-import '../../widgets/common/primary_button.dart';
+import '../../../config/app_colors.dart';
+import '../../../config/app_radius.dart';
+import '../../../config/app_shadows.dart';
+import '../../../config/app_spacing.dart';
+import '../../../config/app_text_styles.dart';
+import '../../../services/admin_service.dart';
+import '../../../services/auth_service.dart';
+import '../../../utils/validators.dart';
+import '../../../widgets/common/app_logo.dart';
+import '../../../widgets/common/custom_text_field.dart';
+import '../../../widgets/common/primary_button.dart';
 
-class ForgotPasswordScreen extends StatefulWidget {
-  const ForgotPasswordScreen({super.key});
+class AdminForgotPasswordScreen extends StatefulWidget {
+  const AdminForgotPasswordScreen({super.key});
 
   @override
-  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  State<AdminForgotPasswordScreen> createState() =>
+      _AdminForgotPasswordScreenState();
 }
 
-class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+class _AdminForgotPasswordScreenState extends State<AdminForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   final _resetFormKey = GlobalKey<FormState>();
-  final AuthService _authService = AuthService();
+  final AdminService _adminService = AdminService();
 
   final _emailController = TextEditingController();
   final _codeController = TextEditingController();
@@ -45,7 +44,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     super.dispose();
   }
 
-  // Request password reset link / code
+  // Request admin reset link
   Future<void> _handleSendResetLink() async {
     if (_isLoading) return; // Prevent multiple requests
     FocusScope.of(context).unfocus();
@@ -56,7 +55,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       });
 
       final email = _emailController.text.trim();
-      final result = await _authService.requestPasswordReset(email);
+      final result = await _adminService.requestPasswordReset(email);
 
       if (mounted) {
         setState(() {
@@ -94,7 +93,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     }
   }
 
-  // Complete password reset
+  // Complete admin password reset
   Future<void> _handleResetPassword() async {
     if (_isLoading) return; // Prevent multiple requests
     FocusScope.of(context).unfocus();
@@ -108,7 +107,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       final code = _codeController.text.trim();
       final newPassword = _newPasswordController.text;
 
-      final result = await _authService.resetPassword(
+      final result = await _adminService.resetPassword(
         email: email,
         token: code,
         newPassword: newPassword,
@@ -130,12 +129,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             ),
           );
 
-          // Return to Login screen
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            AppRoutes.login,
-            (route) => false,
-          );
+          // Return to Admin Login
+          Navigator.pop(context);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -152,59 +147,53 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: AppBackground(
-        child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              padding: AppSpacing.lgHorizontal,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AppSpacing.xlHeight,
-
-                  // Koode Logo with Tagline
-                  const AppLogo(
-                    size: 80,
-                    showTagline: true,
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Branding Header
+                const Text(
+                  "AN INITIATIVE OF UDSF CEV",
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: Color(0xFF004D61),
+                    letterSpacing: 1.2,
+                    fontWeight: FontWeight.bold,
                   ),
+                ),
+                const SizedBox(height: 8),
+                const AppLogo(
+                  size: 64,
+                  showTagline: true,
+                ),
+                const SizedBox(height: 24),
 
-                  AppSpacing.xxlHeight,
-
-                  // Glassmorphism Card
-                  ClipRRect(
-                    borderRadius: AppRadius.extraLargeBorderRadius,
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 32,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.white.withAlpha(217),
-                          borderRadius: AppRadius.extraLargeBorderRadius,
-                          border: Border.all(
-                            color: AppColors.white.withAlpha(200),
-                            width: 1.5,
-                          ),
-                          boxShadow: AppShadows.medium,
-                        ),
-                        child: AnimatedCrossFade(
-                          duration: const Duration(milliseconds: 300),
-                          crossFadeState: _isCodeSent
-                              ? CrossFadeState.showSecond
-                              : CrossFadeState.showFirst,
-                          firstChild: _buildEmailRequestStep(),
-                          secondChild: _buildResetPasswordStep(),
-                        ),
-                      ),
+                // Form Container Card
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: AppColors.white.withAlpha(220),
+                    borderRadius: AppRadius.largeBorderRadius,
+                    border: Border.all(
+                      color: const Color(0xFF004D61).withAlpha(100),
+                      width: 1.5,
                     ),
+                    boxShadow: AppShadows.medium,
                   ),
-
-                  AppSpacing.xlHeight,
-                ],
-              ),
+                  child: AnimatedCrossFade(
+                    duration: const Duration(milliseconds: 300),
+                    crossFadeState: _isCodeSent
+                        ? CrossFadeState.showSecond
+                        : CrossFadeState.showFirst,
+                    firstChild: _buildEmailRequestStep(),
+                    secondChild: _buildResetPasswordStep(),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -212,7 +201,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     );
   }
 
-  // Step 1: Enter email and send reset link
+  // Step 1: Admin email entry & request reset link
   Widget _buildEmailRequestStep() {
     return Form(
       key: _formKey,
@@ -220,36 +209,49 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Forgot Password?',
-            style: AppTextStyles.heading,
+            "Admin Password Recovery",
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: AppColors.black,
+            ),
           ),
           AppSpacing.xsHeight,
           const Text(
-            'Enter your registered email address to reset your password. We will send you verification instructions.',
+            "Enter your registered Admin ID (email) to reset your administrative access password.",
             style: AppTextStyles.caption,
           ),
           AppSpacing.lgHeight,
 
-          // Email Input Field
+          // Admin ID Field
           CustomTextField(
-            controller: _emailController,
-            labelText: 'Student Email',
-            hintText: 'student@campus.edu',
-            prefixIcon: Icons.email_outlined,
+            labelText: "Admin ID",
+            hintText: "admin@campus.edu",
+            prefixIcon: Icons.admin_panel_settings_outlined,
             keyboardType: TextInputType.emailAddress,
-            validator: Validators.email,
+            controller: _emailController,
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Please enter your Admin ID';
+              }
+              if (!RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                  .hasMatch(value.trim())) {
+                return 'Please enter a valid email address';
+              }
+              return null;
+            },
           ),
           AppSpacing.lgHeight,
 
           // Send Reset Link Button
           PrimaryButton(
-            text: 'SEND RESET LINK',
+            text: "Send Reset Link",
             isLoading: _isLoading,
             onPressed: _handleSendResetLink,
           ),
-          AppSpacing.mdHeight,
+          const SizedBox(height: 12),
 
-          // Back to Login Link
+          // Back to Admin Login
           Center(
             child: TextButton.icon(
               onPressed: () {
@@ -258,12 +260,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               icon: const Icon(
                 Icons.arrow_back,
                 size: 16,
-                color: AppColors.primary,
+                color: AppColors.secondary,
               ),
-              label: Text(
-                'Back to Login',
-                style: AppTextStyles.caption.copyWith(
-                  color: AppColors.primary,
+              label: const Text(
+                "Back to Admin Login",
+                style: TextStyle(
+                  color: AppColors.secondary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -274,7 +276,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     );
   }
 
-  // Step 2: Enter code & set new password
+  // Step 2: Verification code and new admin password
   Widget _buildResetPasswordStep() {
     return Form(
       key: _resetFormKey,
@@ -295,40 +297,43 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               ),
               const SizedBox(width: 8),
               const Text(
-                'Set New Password',
-                style: AppTextStyles.heading,
+                "Set New Admin Password",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.black,
+                ),
               ),
             ],
           ),
           AppSpacing.xsHeight,
           Text(
-            'Verification instructions were sent to ${_emailController.text.trim()}. Enter the code and your new password below.',
+            "Enter the verification code sent to ${_emailController.text.trim()} and create a new password.",
             style: AppTextStyles.caption,
           ),
           AppSpacing.mdHeight,
 
-          // Verification Code Field
+          // Code Field
           CustomTextField(
             controller: _codeController,
-            labelText: 'Verification Code',
-            hintText: 'Enter 6-digit code',
+            labelText: "Verification Code",
+            hintText: "Enter 6-digit code",
             prefixIcon: Icons.pin_outlined,
             keyboardType: TextInputType.number,
             validator: (value) => Validators.requiredField(
               value,
-              fieldName: 'Verification code',
+              fieldName: "Verification code",
             ),
           ),
           AppSpacing.mdHeight,
 
           // New Password Field
           CustomTextField(
-            controller: _newPasswordController,
-            labelText: 'New Password',
-            hintText: '••••••••',
+            labelText: "New Password",
+            hintText: "••••••••",
             prefixIcon: Icons.lock_outline,
             obscureText: _obscureNewPassword,
-            validator: Validators.password,
+            controller: _newPasswordController,
             suffixIcon: IconButton(
               icon: Icon(
                 _obscureNewPassword
@@ -342,20 +347,25 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 });
               },
             ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter a new password';
+              }
+              if (value.length < 6) {
+                return 'Password must be at least 6 characters';
+              }
+              return null;
+            },
           ),
           AppSpacing.mdHeight,
 
-          // Confirm New Password Field
+          // Confirm Password Field
           CustomTextField(
-            controller: _confirmPasswordController,
-            labelText: 'Confirm New Password',
-            hintText: '••••••••',
+            labelText: "Confirm New Password",
+            hintText: "••••••••",
             prefixIcon: Icons.lock_reset_outlined,
             obscureText: _obscureConfirmPassword,
-            validator: (value) => Validators.confirmPassword(
-              value,
-              _newPasswordController.text,
-            ),
+            controller: _confirmPasswordController,
             suffixIcon: IconButton(
               icon: Icon(
                 _obscureConfirmPassword
@@ -369,23 +379,27 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 });
               },
             ),
+            validator: (value) => Validators.confirmPassword(
+              value,
+              _newPasswordController.text,
+            ),
           ),
           AppSpacing.lgHeight,
 
-          // Reset Password Button
+          // Reset Button
           PrimaryButton(
-            text: 'RESET PASSWORD',
+            text: "Update Admin Password",
             isLoading: _isLoading,
             onPressed: _handleResetPassword,
           ),
-          AppSpacing.mdHeight,
+          const SizedBox(height: 8),
 
-          // Resend Code / Change Email Option
+          // Resend Code Option
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                "Didn't receive the code?",
+                "Didn't receive instructions?",
                 style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
               ),
               TextButton(
@@ -401,20 +415,16 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             ],
           ),
 
-          // Back to Login Link
+          // Back to Admin Login
           Center(
             child: TextButton(
               onPressed: () {
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  AppRoutes.login,
-                  (route) => false,
-                );
+                Navigator.pop(context);
               },
-              child: Text(
-                'Back to Login',
-                style: AppTextStyles.caption.copyWith(
-                  color: AppColors.textSecondary,
+              child: const Text(
+                "Back to Admin Login",
+                style: TextStyle(
+                  color: AppColors.grey,
                   fontWeight: FontWeight.w600,
                 ),
               ),

@@ -21,7 +21,7 @@ class ComplaintCategoriesSection extends StatelessWidget {
     _CategoryItem(title: 'Laboratory', icon: Icons.science_outlined),
     _CategoryItem(title: 'Hostel', icon: Icons.apartment_outlined),
     _CategoryItem(title: 'Library', icon: Icons.menu_book_outlined),
-    _CategoryItem(title: 'Bus', icon: Icons.directions_bus_outlined),
+    _CategoryItem(title: 'Transport', icon: Icons.commute_outlined),
     _CategoryItem(title: 'Electricity', icon: Icons.bolt_outlined),
     _CategoryItem(title: 'Water', icon: Icons.water_drop_outlined),
     _CategoryItem(title: 'Canteen', icon: Icons.restaurant_outlined),
