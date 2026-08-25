@@ -312,8 +312,15 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: AppBackground(
+   return Scaffold(
+  appBar: AppBar(
+    leading: IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () => Navigator.pop(context),
+    ),
+    title: const Text('Register Complaint'),
+  ),
+  body: AppBackground(
         child: SafeArea(
           child: SingleChildScrollView(
             child: Padding(

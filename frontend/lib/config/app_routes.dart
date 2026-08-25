@@ -10,5 +10,6 @@ class AppRoutes {
   static const String editProfile = '/edit-profile';
   static const String privacyPolicy = '/privacy-policy';
   static const String aboutKoode = '/about-koode';
+  static const String helpSupport = '/help-support';
   static const String createComplaint = '/create-complaint';
 }

@@ -292,92 +292,138 @@ class _NotesScreenState extends State<NotesScreen> {
                   ),
 
                   AppSpacing.mdHeight,
+// Filter Row (Semester & Subject Dropdowns)
+Row(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    // Semester
+    Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(
+              left: 12,
+              bottom: 6,
+            ),
+            child: Text(
+              'Semester',
+              style: TextStyle(
+                fontSize: 14,
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          DropdownButtonFormField<String>(
+            initialValue: _selectedSemester,
+            decoration: const InputDecoration(
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 12,
+              ),
+              filled: true,
+              fillColor: AppColors.surface,
+              border: OutlineInputBorder(
+                borderRadius: AppRadius.mediumBorderRadius,
+                borderSide: BorderSide(
+                  color: AppColors.border,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: AppRadius.mediumBorderRadius,
+                borderSide: BorderSide(
+                  color: AppColors.border,
+                ),
+              ),
+            ),
+            onChanged: (val) {
+              if (val != null) {
+                setState(() {
+                  _selectedSemester = val;
+                });
+              }
+            },
+            items: _semesters.map((sem) {
+              return DropdownMenuItem<String>(
+                value: sem,
+                child: Text(sem),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    ),
 
-                  // Filter Row (Semester & Subject Dropdowns)
-                  Row(
-                    children: [
-                      // Semester Dropdown Filter
-                      Expanded(
-                        child: DropdownButtonFormField<String>(
-                          initialValue: _selectedSemester,
-                          decoration: const InputDecoration(
-                            labelText: 'Semester',
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 12,
-                            ),
-                            filled: true,
-                            fillColor: AppColors.surface,
-                            border: OutlineInputBorder(
-                              borderRadius: AppRadius.mediumBorderRadius,
-                              borderSide: BorderSide(color: AppColors.border),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: AppRadius.mediumBorderRadius,
-                              borderSide: BorderSide(color: AppColors.border),
-                            ),
-                          ),
-                          onChanged: (val) {
-                            if (val != null) {
-                              setState(() {
-                                _selectedSemester = val;
-                              });
-                            }
-                          },
-                          items: _semesters.map((sem) {
-                            return DropdownMenuItem<String>(
-                              value: sem,
-                              child: Text(sem),
-                            );
-                          }).toList(),
-                        ),
-                      ),
+    const SizedBox(width: 12),
 
-                      const SizedBox(width: 12),
+    // Subject
+    Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(
+              left: 12,
+              bottom: 6,
+            ),
+            child: Text(
+              'Subject',
+              style: TextStyle(
+                fontSize: 14,
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          DropdownButtonFormField<String>(
+            initialValue: _selectedSubject,
+            decoration: const InputDecoration(
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 12,
+              ),
+              filled: true,
+              fillColor: AppColors.surface,
+              border: OutlineInputBorder(
+                borderRadius: AppRadius.mediumBorderRadius,
+                borderSide: BorderSide(
+                  color: AppColors.border,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: AppRadius.mediumBorderRadius,
+                borderSide: BorderSide(
+                  color: AppColors.border,
+                ),
+              ),
+            ),
+            onChanged: (val) {
+              if (val != null) {
+                setState(() {
+                  _selectedSubject = val;
+                });
+              }
+            },
+            items: _subjects.map((subj) {
+              return DropdownMenuItem<String>(
+                value: subj,
+                child: Text(
+                  subj,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    ),
+  ],
+),
 
-                      // Subject Dropdown Filter
-                      Expanded(
-                        child: DropdownButtonFormField<String>(
-                          initialValue: _selectedSubject,
-                          decoration: const InputDecoration(
-                            labelText: 'Subject',
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 12,
-                            ),
-                            filled: true,
-                            fillColor: AppColors.surface,
-                            border: OutlineInputBorder(
-                              borderRadius: AppRadius.mediumBorderRadius,
-                              borderSide: BorderSide(color: AppColors.border),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: AppRadius.mediumBorderRadius,
-                              borderSide: BorderSide(color: AppColors.border),
-                            ),
-                          ),
-                          onChanged: (val) {
-                            if (val != null) {
-                              setState(() {
-                                _selectedSubject = val;
-                              });
-                            }
-                          },
-                          items: _subjects.map((subj) {
-                            return DropdownMenuItem<String>(
-                              value: subj,
-                              child: Text(
-                                subj,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ],
-                  ),
+AppSpacing.lgHeight,
 
-                  AppSpacing.lgHeight,
+                
 
                   // Loading State
                   if (_isLoading)

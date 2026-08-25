@@ -313,17 +313,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           },
                         ),
                         const Divider(height: 1, color: AppColors.border),
-                        _OptionTile(
-                          icon: Icons.help_outline,
-                          title: 'Help & Support',
-                          onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Contact support@koode.campus'),
-                              ),
-                            );
-                          },
-                        ),
+_OptionTile(
+  icon: Icons.help_outline,
+  title: 'Help & Support',
+  onTap: () {
+    Navigator.pushNamed(
+      context,
+      AppRoutes.helpSupport,
+    );
+  },
+),
                         const Divider(height: 1, color: AppColors.border),
                         _OptionTile(
                           icon: Icons.info_outline,
