@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart'; // FIXED: Lowercase 'i'
-// import 'active_banners_screen.dart'; // TEMPORARILY HIDDEN: Until you create this file!
+import 'package:flutter/material.dart';
+import 'active_banners_screen.dart';
 
 class ManageSpotlightBannerDialog extends StatefulWidget {
   const ManageSpotlightBannerDialog({super.key});
@@ -13,8 +13,11 @@ class _ManageSpotlightBannerDialogState
     extends State<ManageSpotlightBannerDialog> {
   final TextEditingController _buttonTextController =
       TextEditingController(text: "Register Now!");
+
   final TextEditingController _buttonLinkController =
-      TextEditingController(text: "http://koode.dev/fest-register");
+      TextEditingController(
+    text: "http://koode.dev/fest-register",
+  );
 
   @override
   void dispose() {
@@ -27,13 +30,19 @@ class _ManageSpotlightBannerDialogState
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      insetPadding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 24,
+      ),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: const Color(0xFFD4E7ED),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFF004D61), width: 1.5),
+          border: Border.all(
+            color: const Color(0xFF004D61),
+            width: 1.5,
+          ),
         ),
         child: SingleChildScrollView(
           child: Column(
@@ -48,113 +57,171 @@ class _ManageSpotlightBannerDialogState
                   color: Color(0xFF003344),
                 ),
               ),
+
               const SizedBox(height: 16),
 
-              // Upload Box
-              const Text("Upload Banner Image (Required)",
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+              // Upload Banner
+              const Text(
+                "Upload Banner Image (Required)",
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+
               const SizedBox(height: 6),
+
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade600),
+                  border: Border.all(
+                    color: Colors.grey.shade600,
+                  ),
                 ),
-                child: Column(
-                  children: const [
-                    Icon(Icons.camera_alt, size: 36, color: Colors.black87),
+                child: const Column(
+                  children: [
+                    Icon(
+                      Icons.camera_alt,
+                      size: 36,
+                      color: Colors.black87,
+                    ),
+
                     SizedBox(height: 6),
-                    Text("Tap to upload or drag & drop",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 13)),
-                    SizedBox(height: 4),
+
                     Text(
-                      "Recommended dimensions: 1000 x 400 px.\nMax size: 5MB. Format: JPG or PNG.",
+                      "Tap to upload or drag & drop",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+
+                    SizedBox(height: 4),
+
+                    Text(
+                      "Recommended dimensions: 1000 x 400 px.\n"
+                      "Max size: 5MB. Format: JPG or PNG.",
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 10, color: Colors.black54),
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: Colors.black54,
+                      ),
                     ),
                   ],
                 ),
               ),
+
               const SizedBox(height: 12),
 
-              // Button Text Input
-              const Text("Button Text (e.g., Learn More, Register Now)",
-                  style: TextStyle(fontSize: 12)),
+              // Button Text
+              const Text(
+                "Button Text (e.g., Learn More, Register Now)",
+                style: TextStyle(fontSize: 12),
+              ),
+
               const SizedBox(height: 4),
+
               TextField(
                 controller: _buttonTextController,
                 decoration: InputDecoration(
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                   fillColor: Colors.white.withValues(alpha: 0.6),
                   filled: true,
                   border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8)),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
               ),
+
               const SizedBox(height: 12),
 
-              // Button Link Input
-              const Text("Button Link (URL)", style: TextStyle(fontSize: 12)),
+              // Button Link
+              const Text(
+                "Button Link (URL)",
+                style: TextStyle(fontSize: 12),
+              ),
+
               const SizedBox(height: 4),
+
               TextField(
                 controller: _buttonLinkController,
                 decoration: InputDecoration(
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                   fillColor: Colors.white.withValues(alpha: 0.6),
                   filled: true,
                   border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8)),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
               ),
+
               const SizedBox(height: 24),
 
-              // Action Buttons
+              // Add / Cancel
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   OutlinedButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text("Cancel"),
-                  ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF009688)),
                     onPressed: () {
-                      // TODO: Save Banner logic
                       Navigator.pop(context);
                     },
-                    child: const Text("Add Banner",
-                        style: TextStyle(color: Colors.white)),
+                    child: const Text("Cancel"),
+                  ),
+
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF009688),
+                    ),
+                    onPressed: () {
+                      // Backend save logic can be connected later.
+                      Navigator.pop(context);
+                    },
+                    child: const Text(
+                      "Add Banner",
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ],
               ),
+
               const SizedBox(height: 12),
-              
-              // Manage Existing Banners Button
+
+              // Manage Existing Banners
               SizedBox(
                 width: double.infinity,
                 child: TextButton.icon(
                   onPressed: () {
-                    // Temporarily just closes the dialog until the screen is built
+                    // First close the dialog
                     Navigator.pop(context);
-                    
-                    /* UNCOMMENT THIS LATER ONCE THE SCREEN IS BUILT
+
+                    // Then open Active Banners page
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const ActiveBannersScreen(),
+                        builder: (context) =>
+                            const ActiveBannersScreen(),
                       ),
                     );
-                    */
                   },
-                  icon: const Icon(Icons.settings, color: Color(0xFF004D61)),
+                  icon: const Icon(
+                    Icons.settings,
+                    color: Color(0xFF004D61),
+                  ),
                   label: const Text(
                     "Manage Existing Banners",
-                    style: TextStyle(color: Color(0xFF004D61)),
+                    style: TextStyle(
+                      color: Color(0xFF004D61),
+                    ),
                   ),
                 ),
               ),

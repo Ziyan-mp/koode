@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../config/app_colors.dart';
+import 'admin_complaint_details_screen.dart';
 
 class AdminComplaintsScreen extends StatelessWidget {
   const AdminComplaintsScreen({super.key});
@@ -26,6 +27,8 @@ class AdminComplaintsScreen extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           itemCount: 4,
           itemBuilder: (context, index) {
+            final complaintId = "C14${5 + index}B2";
+
             return Card(
               margin: const EdgeInsets.only(bottom: 12),
               shape: RoundedRectangleBorder(
@@ -38,9 +41,10 @@ class AdminComplaintsScreen extends StatelessWidget {
                 ),
                 subtitle: const Text("Category: Infrastructure | 3h ago"),
                 trailing: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.orange.withValues(alpha: 0.2),
+                    color: Colors.orange.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Text(
@@ -53,7 +57,14 @@ class AdminComplaintsScreen extends StatelessWidget {
                   ),
                 ),
                 onTap: () {
-                  // Navigate to admin complaint details
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AdminComplaintDetailsScreen(
+                        complaintId: complaintId,
+                      ),
+                    ),
+                  );
                 },
               ),
             );
