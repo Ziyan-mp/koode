@@ -3,6 +3,7 @@ import '../complaints/admin_complaints_screen.dart';
 import '../settings/admin_settings_screen.dart';
 import '../users/manage_users_screen.dart';
 import '../banner/manage_spotlight_banner_dialog.dart';
+import '../../../widgets/common/app_logo.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -77,22 +78,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
               // Current Koode logo text
               // We can replace this with the actual logo asset later.
-              const Text(
-                "കൂടെ",
-                style: TextStyle(
-                  fontSize: 64,
-                  color: Color(0xFF7B8BB2),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-
-              const Text(
-                "your voice your campus",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF004D61),
-                ),
-              ),
+             const AppLogo(
+  size: 80,
+  showTagline: true,
+),
+             
 
               const SizedBox(height: 12),
 
