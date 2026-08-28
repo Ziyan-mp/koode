@@ -87,7 +87,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               ),
 
               const Text(
-                "your campus",
+                "your voice your campus",
                 style: TextStyle(
                   fontSize: 14,
                   color: Color(0xFF004D61),
@@ -330,12 +330,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
               const SizedBox(height: 16),
 
-              const CircularProgressIndicator(
-                color: Color(0xFF004D61),
-              ),
-
-              const SizedBox(height: 16),
-
               const Text(
                 "© powered by UDSF CEV",
                 style: TextStyle(
@@ -462,38 +456,36 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   // QUICK ACTION PILL
   // -------------------------------------------------------------------
 
-  Widget _buildActionPill(
-    BuildContext context,
-    String title,
-    Widget targetScreen, {
-    bool isPrimary = false,
-  }) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor:
-            isPrimary ? const Color(0xFF009688) : Colors.grey.shade400,
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+ Widget _buildActionPill(
+  BuildContext context,
+  String title,
+  Widget targetScreen, {
+  bool isPrimary = false,
+}) {
+  return ElevatedButton(
+    style: ElevatedButton.styleFrom(
+      backgroundColor: const Color(0xFF009688),
+      foregroundColor: Colors.white,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
       ),
-
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => targetScreen,
-          ),
-        );
-      },
-
-      child: Text(
-        title,
-        style: TextStyle(
-          color: isPrimary ? Colors.white : Colors.black87,
-          fontSize: 13,
+    ),
+    onPressed: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => targetScreen,
         ),
+      );
+    },
+    child: Text(
+      title,
+      style: const TextStyle(
+        color: Colors.white,
+        fontSize: 13,
       ),
-    );
-  }
+    ),
+  );
+}
 }

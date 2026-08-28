@@ -249,41 +249,7 @@ class _AdminComplaintDetailsScreenState
                         style: TextStyle(fontSize: 10)),
                     const SizedBox(height: 12),
 
-                    // Actions Buttons Row
-                    const Text(
-                      'Actions',
-                      style: TextStyle(
-                          fontSize: 12, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildActionButton(
-                            'Assign to Dept.',
-                            Colors.grey.shade700,
-                            () {},
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: _buildActionButton(
-                            'Mark as In Progress',
-                            const Color(0xFF0D9488),
-                            () {},
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: _buildActionButton(
-                            'Add Note',
-                            Colors.grey.shade700,
-                            () {},
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
+
 
                     // Admin Notes Input Field
                     const Text(
@@ -419,28 +385,6 @@ class _AdminComplaintDetailsScreenState
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildActionButton(
-      String label, Color color, VoidCallback onPressed) {
-    return SizedBox(
-      height: 28,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color,
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-        ),
-        onPressed: onPressed,
-        child: Text(
-          label,
-          style: const TextStyle(fontSize: 9, color: Colors.white),
-          textAlign: TextAlign.center,
-        ),
-      ),
     );
   }
 }
