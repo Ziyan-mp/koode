@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../config/app_colors.dart';
 import '../../config/app_radius.dart';
 
@@ -14,6 +15,12 @@ class CustomTextField extends StatelessWidget {
   final int? maxLines;
   final int? minLines;
 
+  // Keyboard / focus behavior
+  final TextInputAction? textInputAction;
+  final ValueChanged<String>? onSubmitted;
+  final FocusNode? focusNode;
+  final bool autofocus;
+
   const CustomTextField({
     super.key,
     required this.controller,
@@ -26,14 +33,22 @@ class CustomTextField extends StatelessWidget {
     this.suffixIcon,
     this.maxLines = 1,
     this.minLines,
+    this.textInputAction,
+    this.onSubmitted,
+    this.focusNode,
+    this.autofocus = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
+      focusNode: focusNode,
+      autofocus: autofocus,
       obscureText: obscureText,
       keyboardType: keyboardType,
+      textInputAction: textInputAction,
+      onFieldSubmitted: onSubmitted,
       validator: validator,
       maxLines: maxLines,
       minLines: minLines,
@@ -59,11 +74,15 @@ class CustomTextField extends StatelessWidget {
         ),
         border: const OutlineInputBorder(
           borderRadius: AppRadius.mediumBorderRadius,
-          borderSide: BorderSide(color: AppColors.border),
+          borderSide: BorderSide(
+            color: AppColors.border,
+          ),
         ),
         enabledBorder: const OutlineInputBorder(
           borderRadius: AppRadius.mediumBorderRadius,
-          borderSide: BorderSide(color: AppColors.border),
+          borderSide: BorderSide(
+            color: AppColors.border,
+          ),
         ),
         focusedBorder: const OutlineInputBorder(
           borderRadius: AppRadius.mediumBorderRadius,
@@ -74,7 +93,9 @@ class CustomTextField extends StatelessWidget {
         ),
         errorBorder: const OutlineInputBorder(
           borderRadius: AppRadius.mediumBorderRadius,
-          borderSide: BorderSide(color: AppColors.error),
+          borderSide: BorderSide(
+            color: AppColors.error,
+          ),
         ),
         focusedErrorBorder: const OutlineInputBorder(
           borderRadius: AppRadius.mediumBorderRadius,

@@ -1,5 +1,7 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
+
 import '../../config/app_colors.dart';
 import '../../config/app_radius.dart';
 import '../../config/app_routes.dart';
@@ -22,130 +24,86 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _resetFormKey = GlobalKey<FormState>();
   final AuthService _authService = AuthService();
 
   final _emailController = TextEditingController();
-  final _codeController = TextEditingController();
   final _newPasswordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
   bool _isLoading = false;
-  bool _isCodeSent = false;
   bool _obscureNewPassword = true;
   bool _obscureConfirmPassword = true;
-  String? _simulatedCode;
 
   @override
   void dispose() {
     _emailController.dispose();
-    _codeController.dispose();
     _newPasswordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  // Request password reset link / code
-  Future<void> _handleSendResetLink() async {
-    if (_isLoading) return; // Prevent multiple requests
+  Future<void> _resetPassword() async {
+    if (_isLoading) return;
+
     FocusScope.of(context).unfocus();
 
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
-
-      final email = _emailController.text.trim();
-      final result = await _authService.requestPasswordReset(email);
-
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-
-        if (result.status == AuthStatus.success) {
-          setState(() {
-            _isCodeSent = true;
-            _simulatedCode = result.resetCode;
-            if (_simulatedCode != null) {
-              _codeController.text = _simulatedCode!;
-            }
-          });
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Password reset instructions have been sent to your email.',
-              ),
-              backgroundColor: AppColors.success,
-              duration: Duration(seconds: 4),
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(result.message),
-              backgroundColor: AppColors.error,
-              duration: const Duration(seconds: 4),
-            ),
-          );
-        }
-      }
+    if (!_formKey.currentState!.validate()) {
+      return;
     }
-  }
 
-  // Complete password reset
-  Future<void> _handleResetPassword() async {
-    if (_isLoading) return; // Prevent multiple requests
-    FocusScope.of(context).unfocus();
+    setState(() {
+      _isLoading = true;
+    });
 
-    if (_resetFormKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
+    final email = _emailController.text.trim();
+    final newPassword = _newPasswordController.text;
 
-      final email = _emailController.text.trim();
-      final code = _codeController.text.trim();
-      final newPassword = _newPasswordController.text;
+    /*
+     * Simple password reset.
+     *
+     * The backend should identify the student using the email
+     * and securely update the password.
+     *
+     * If your current AuthService still requires a verification
+     * token, we will update AuthService/backend next.
+     */
 
-      final result = await _authService.resetPassword(
-        email: email,
-        token: code,
-        newPassword: newPassword,
+    final result = await _authService.resetPassword(
+      email: email,
+      token: '',
+      newPassword: newPassword,
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (result.status == AuthStatus.success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Password reset successfully! Please login with your new password.',
+          ),
+          backgroundColor: AppColors.success,
+          duration: Duration(seconds: 3),
+        ),
       );
 
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-
-        if (result.status == AuthStatus.success) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Password reset successfully! Please login with your new password.',
-              ),
-              backgroundColor: AppColors.success,
-              duration: Duration(seconds: 3),
-            ),
-          );
-
-          // Return to Login screen
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            AppRoutes.login,
-            (route) => false,
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(result.message),
-              backgroundColor: AppColors.error,
-              duration: const Duration(seconds: 4),
-            ),
-          );
-        }
-      }
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        AppRoutes.login,
+        (route) => false,
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result.message),
+          backgroundColor: AppColors.error,
+          duration: const Duration(seconds: 4),
+        ),
+      );
     }
   }
 
@@ -163,7 +121,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 children: [
                   AppSpacing.xlHeight,
 
-                  // Koode Logo with Tagline
+                  // Koode Logo
                   const AppLogo(
                     size: 80,
                     showTagline: true,
@@ -175,28 +133,166 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ClipRRect(
                     borderRadius: AppRadius.extraLargeBorderRadius,
                     child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                      filter: ImageFilter.blur(
+                        sigmaX: 12,
+                        sigmaY: 12,
+                      ),
                       child: Container(
+                        width: double.infinity,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 24,
                           vertical: 32,
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.white.withAlpha(217),
-                          borderRadius: AppRadius.extraLargeBorderRadius,
+                          borderRadius:
+                              AppRadius.extraLargeBorderRadius,
                           border: Border.all(
                             color: AppColors.white.withAlpha(200),
                             width: 1.5,
                           ),
                           boxShadow: AppShadows.medium,
                         ),
-                        child: AnimatedCrossFade(
-                          duration: const Duration(milliseconds: 300),
-                          crossFadeState: _isCodeSent
-                              ? CrossFadeState.showSecond
-                              : CrossFadeState.showFirst,
-                          firstChild: _buildEmailRequestStep(),
-                          secondChild: _buildResetPasswordStep(),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Forgot Password?',
+                                style: AppTextStyles.heading,
+                              ),
+
+                              AppSpacing.xsHeight,
+
+                              const Text(
+                                'Enter your registered email and create a new password.',
+                                style: AppTextStyles.caption,
+                              ),
+
+                              AppSpacing.lgHeight,
+
+                              // Email
+                              CustomTextField(
+                                controller: _emailController,
+                                labelText: 'Student Email',
+                                hintText: 'student@campus.edu',
+                                prefixIcon: Icons.email_outlined,
+                                keyboardType:
+                                    TextInputType.emailAddress,
+                                textInputAction:
+                                    TextInputAction.next,
+                                validator: Validators.email,
+                              ),
+
+                              AppSpacing.mdHeight,
+
+                              // New Password
+                              CustomTextField(
+                                controller: _newPasswordController,
+                                labelText: 'New Password',
+                                hintText: '••••••••',
+                                prefixIcon: Icons.lock_outline,
+                                obscureText:
+                                    _obscureNewPassword,
+                                textInputAction:
+                                    TextInputAction.next,
+                                validator: Validators.password,
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscureNewPassword
+                                        ? Icons.visibility_off_outlined
+                                        : Icons.visibility_outlined,
+                                    color:
+                                        AppColors.textSecondary,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscureNewPassword =
+                                          !_obscureNewPassword;
+                                    });
+                                  },
+                                ),
+                              ),
+
+                              AppSpacing.mdHeight,
+
+                              // Confirm Password
+                              CustomTextField(
+                                controller:
+                                    _confirmPasswordController,
+                                labelText: 'Confirm New Password',
+                                hintText: '••••••••',
+                                prefixIcon:
+                                    Icons.lock_reset_outlined,
+                                obscureText:
+                                    _obscureConfirmPassword,
+                                textInputAction:
+                                    TextInputAction.done,
+                                validator: (value) =>
+                                    Validators.confirmPassword(
+                                  value,
+                                  _newPasswordController.text,
+                                ),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscureConfirmPassword
+                                        ? Icons.visibility_off_outlined
+                                        : Icons.visibility_outlined,
+                                    color:
+                                        AppColors.textSecondary,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscureConfirmPassword =
+                                          !_obscureConfirmPassword;
+                                    });
+                                  },
+                                ),
+                                onSubmitted: (_) {
+                                  _resetPassword();
+                                },
+                              ),
+
+                              AppSpacing.lgHeight,
+
+                              // Reset Password
+                              PrimaryButton(
+                                text: 'RESET PASSWORD',
+                                isLoading: _isLoading,
+                                onPressed: _resetPassword,
+                              ),
+
+                              AppSpacing.mdHeight,
+
+                              // Back to Login
+                              Center(
+                                child: TextButton.icon(
+                                  onPressed: () {
+                                    Navigator.pushNamedAndRemoveUntil(
+                                      context,
+                                      AppRoutes.login,
+                                      (route) => false,
+                                    );
+                                  },
+                                  icon: const Icon(
+                                    Icons.arrow_back,
+                                    size: 16,
+                                    color: AppColors.primary,
+                                  ),
+                                  label: Text(
+                                    'Back to Login',
+                                    style: AppTextStyles.caption
+                                        .copyWith(
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -208,219 +304,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  // Step 1: Enter email and send reset link
-  Widget _buildEmailRequestStep() {
-    return Form(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Forgot Password?',
-            style: AppTextStyles.heading,
-          ),
-          AppSpacing.xsHeight,
-          const Text(
-            'Enter your registered email address to reset your password. We will send you verification instructions.',
-            style: AppTextStyles.caption,
-          ),
-          AppSpacing.lgHeight,
-
-          // Email Input Field
-          CustomTextField(
-            controller: _emailController,
-            labelText: 'Student Email',
-            hintText: 'student@campus.edu',
-            prefixIcon: Icons.email_outlined,
-            keyboardType: TextInputType.emailAddress,
-            validator: Validators.email,
-          ),
-          AppSpacing.lgHeight,
-
-          // Send Reset Link Button
-          PrimaryButton(
-            text: 'SEND RESET LINK',
-            isLoading: _isLoading,
-            onPressed: _handleSendResetLink,
-          ),
-          AppSpacing.mdHeight,
-
-          // Back to Login Link
-          Center(
-            child: TextButton.icon(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: const Icon(
-                Icons.arrow_back,
-                size: 16,
-                color: AppColors.primary,
-              ),
-              label: Text(
-                'Back to Login',
-                style: AppTextStyles.caption.copyWith(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Step 2: Enter code & set new password
-  Widget _buildResetPasswordStep() {
-    return Form(
-      key: _resetFormKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              IconButton(
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-                icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
-                onPressed: () {
-                  setState(() {
-                    _isCodeSent = false;
-                  });
-                },
-              ),
-              const SizedBox(width: 8),
-              const Text(
-                'Set New Password',
-                style: AppTextStyles.heading,
-              ),
-            ],
-          ),
-          AppSpacing.xsHeight,
-          Text(
-            'Verification instructions were sent to ${_emailController.text.trim()}. Enter the code and your new password below.',
-            style: AppTextStyles.caption,
-          ),
-          AppSpacing.mdHeight,
-
-          // Verification Code Field
-          CustomTextField(
-            controller: _codeController,
-            labelText: 'Verification Code',
-            hintText: 'Enter 6-digit code',
-            prefixIcon: Icons.pin_outlined,
-            keyboardType: TextInputType.number,
-            validator: (value) => Validators.requiredField(
-              value,
-              fieldName: 'Verification code',
-            ),
-          ),
-          AppSpacing.mdHeight,
-
-          // New Password Field
-          CustomTextField(
-            controller: _newPasswordController,
-            labelText: 'New Password',
-            hintText: '••••••••',
-            prefixIcon: Icons.lock_outline,
-            obscureText: _obscureNewPassword,
-            validator: Validators.password,
-            suffixIcon: IconButton(
-              icon: Icon(
-                _obscureNewPassword
-                    ? Icons.visibility_off_outlined
-                    : Icons.visibility_outlined,
-                color: AppColors.textSecondary,
-              ),
-              onPressed: () {
-                setState(() {
-                  _obscureNewPassword = !_obscureNewPassword;
-                });
-              },
-            ),
-          ),
-          AppSpacing.mdHeight,
-
-          // Confirm New Password Field
-          CustomTextField(
-            controller: _confirmPasswordController,
-            labelText: 'Confirm New Password',
-            hintText: '••••••••',
-            prefixIcon: Icons.lock_reset_outlined,
-            obscureText: _obscureConfirmPassword,
-            validator: (value) => Validators.confirmPassword(
-              value,
-              _newPasswordController.text,
-            ),
-            suffixIcon: IconButton(
-              icon: Icon(
-                _obscureConfirmPassword
-                    ? Icons.visibility_off_outlined
-                    : Icons.visibility_outlined,
-                color: AppColors.textSecondary,
-              ),
-              onPressed: () {
-                setState(() {
-                  _obscureConfirmPassword = !_obscureConfirmPassword;
-                });
-              },
-            ),
-          ),
-          AppSpacing.lgHeight,
-
-          // Reset Password Button
-          PrimaryButton(
-            text: 'RESET PASSWORD',
-            isLoading: _isLoading,
-            onPressed: _handleResetPassword,
-          ),
-          AppSpacing.mdHeight,
-
-          // Resend Code / Change Email Option
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "Didn't receive the code?",
-                style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
-              ),
-              TextButton(
-                onPressed: _isLoading ? null : _handleSendResetLink,
-                child: Text(
-                  'Resend',
-                  style: AppTextStyles.caption.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          // Back to Login Link
-          Center(
-            child: TextButton(
-              onPressed: () {
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  AppRoutes.login,
-                  (route) => false,
-                );
-              },
-              child: Text(
-                'Back to Login',
-                style: AppTextStyles.caption.copyWith(
-                  color: AppColors.textSecondary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
